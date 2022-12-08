@@ -65,25 +65,37 @@ def double_bridge_move(solution):
     part_three = part_two + 1 + randrange(0, slice_length)
     return solution[0:part_one] + solution[part_three:] + solution[part_two:part_three] + solution[part_one:part_two]
     
-def perturb(solution):
+def perturb(solution, history:list):
     new_solution = double_bridge_move(solution)
     new_cost = tour_cost(new_solution)
+    history.append((new_solution, new_cost))
     return new_solution, new_cost
 
-def iterated_local_search(data, threshold = 50, iterations: int = 1000):
+def iterated_local_search(data, threshold = 50, iterations: int = 1000, degradation_grace_period = -1):
     start_time = time()
-    best_solution = construct_initial_solution(data)
-    best_cost = tour_cost(best_solution)
+    history = []
+    grace_period = degradation_grace_period
+    base_solution = construct_initial_solution(data)
+    base_cost = tour_cost(base_solution)
     # Getting local optima
-    best_solution, best_cost = local_search(best_solution, best_cost, threshold)
+    best_solution, best_cost = base_solution, base_cost = local_search(base_solution, base_cost, threshold)
     i = 0
     while ( i < iterations):
-        solution, cost = perturb(best_solution)
+        solution, cost = perturb(base_solution, history)
         solution, cost = local_search(solution, cost, threshold)        
         if (cost < best_cost):
             best_solution = solution
             best_cost = cost
             logging.info(f"The best cost {best_cost} is found at {i+1}th iteration with threshold {threshold}")
+        if (cost <= base_cost):
+            base_solution, base_cost = solution, cost
+        elif len(history) > 0 and grace_period > -1:
+            grace_period -= 1
+            if grace_period == 0:
+                solution, cost = history.pop()
+                logging.info(f"Degraded base solution with cost {base_cost} to the solution with cost {cost}")
+                base_solution, base_cost = solution, cost
+                grace_period = degradation_grace_period
         i += 1
     
     end_time = time()
