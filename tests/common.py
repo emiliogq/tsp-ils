@@ -1,6 +1,8 @@
 
 from ils import iterated_local_search
 
+import logging
+
 berlin52 = [[565,575], [25,185], [345,750], [945,685], [845,655],
             [880,660], [25,230] , [525, 1000] , [580, 1175], [650, 1130] , [165,620],
             [122,580], [1465, 200] , [1530,5], [845,680], [725,370], [145,665],
@@ -23,13 +25,13 @@ def find_best_parameters(iterations, thresholds):
     progress = 0.0
     for i in iterations:        
         for j in thresholds:
-            print(f"\nILS run with {i} iterations and {j} threshold")
-            print("----------------------")
+            logging.info(f"\nILS run with {i} iterations and {j} threshold")
+            logging.info("----------------------")
             _, cost, elapsed_time = iterated_local_search(berlin52, threshold=j, iterations=i)
             results.append((i, j, cost, elapsed_time))
             progress = progress + (1.0 / (len(iterations) * len(thresholds)))
 
-            print(f"\nProgress {progress*100:.2f}% \n")
+            logging.info(f"\nProgress {progress*100:.2f}% \n")
     min_result = min(results, key=lambda result: (result[2],result[3]))
     return min_result
 
