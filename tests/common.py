@@ -30,8 +30,8 @@ def find_best_parameters(data, iterations = 20, thresholds = 20):
         for j in thresholds:
             logging.info(f"\nILS run with {i} iterations and {j} threshold")
             logging.info("----------------------")
-            _, cost, elapsed_time = ils.run(data, threshold=j, iterations=i)
-            results.append((i, j, cost, elapsed_time))
+            solution, elapsed_time = ils.run(data, threshold=j, iterations=i)
+            results.append((i, j, solution.cost, elapsed_time))
             progress = progress + (1.0 / (len(iterations) * len(thresholds)))
 
             logging.info(f"\nProgress {progress*100:.2f}% \n")
