@@ -43,3 +43,21 @@ def split_list(list):
     medium = list[middle:middle+2]
     high = list[size - 2 :]
     return low + medium + high
+
+def read_nodes_file(filename:str, node_line_start:int, node_line_end:int):
+    with open(filename) as file:
+        lines = file.readlines()
+        raw_nodes = lines[node_line_start:node_line_end]
+        return [ create_node(raw_node) for raw_node in raw_nodes ]
+        
+def read_tour_file(filename:str, node_line_start, node_line_end):
+    with open(filename) as file:
+        lines = file.readlines()
+        raw_nodes_indexes = lines[node_line_start:node_line_end]
+        return [ int(index_line.strip()) for index_line in raw_nodes_indexes ]
+        
+
+def create_node(raw_node: str):
+    node = raw_node.strip().split(" ")
+    _, x, y = node
+    return [float(x),float(y)]
