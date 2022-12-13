@@ -1,5 +1,5 @@
 
-from ils import iterated_local_search
+from ils import ILS
 
 import logging
 
@@ -20,14 +20,17 @@ def fibonacci(n, memory = {}):
     memory[str(n)] = result
     return result
 
-def find_best_parameters(iterations, thresholds):
+def find_best_parameters(data, iterations = 20, thresholds = 20):
     results = []
+    ils = ILS()
     progress = 0.0
+    iterations, thresholds = [fibonacci(i) for i in range(2, iterations)], [fibonacci(i) for i in range(2, thresholds)]
+    iterations, thresholds = split_list(iterations), split_list(thresholds) 
     for i in iterations:        
         for j in thresholds:
             logging.info(f"\nILS run with {i} iterations and {j} threshold")
             logging.info("----------------------")
-            _, cost, elapsed_time = iterated_local_search(berlin52, threshold=j, iterations=i)
+            _, cost, elapsed_time = ils.run(data, threshold=j, iterations=i)
             results.append((i, j, cost, elapsed_time))
             progress = progress + (1.0 / (len(iterations) * len(thresholds)))
 
