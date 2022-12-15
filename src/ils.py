@@ -54,6 +54,8 @@ class ILS(ABC):
             logging.info(f"The best cost {best_solution.cost} is found at {i+1}th iteration with threshold {threshold}")
         if (solution <= base_solution):
             base_solution = solution
+            if solution not in self.history:
+                self.register(solution)
         elif len(self.history) > 0 and grace_period > -1:
             grace_period -= 1
             if grace_period == 0:
@@ -76,7 +78,6 @@ class ILS(ABC):
         i = 0
         while ( i < iterations):
             solution = self.perturb(base_solution)
-            self.register(solution)
             solution = self.local_search(solution, threshold)        
             base_solution, best_solution = self.acceptance_criterion(base_solution, best_solution, solution, i, threshold, degradation_grace_period)
             i += 1
