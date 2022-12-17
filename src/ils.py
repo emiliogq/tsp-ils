@@ -23,35 +23,24 @@ class ILS(ABC):
         
         return Solution(permutation)
 
-    def tour_cost(self, nodes):
-        distance = 0.0
-        size = len(nodes)
-        for i in range(size-1):
-            distance += euclidean_distance(nodes[i], nodes[i+1])
-        distance += euclidean_distance(nodes[-1],nodes[0])
-        return distance
-
     def local_search(self, solution, threshold):
         i = 0
-        while( i < threshold):
+        while i < threshold:
             new_solution = Solution(stochastic_two_opt(solution.nodes))
-            new_solution.cost = self.tour_cost(new_solution.nodes)
             solution = new_solution if (new_solution < solution) else solution
             i += 1
         return solution
 
 
     def perturb(self,solution:Solution):
-        new_solution = Solution(double_bridge_move(solution.nodes))
-        new_solution.cost = self.tour_cost(new_solution.nodes)
-        return new_solution
+        return Solution(double_bridge_move(solution.nodes))
 
 
     def acceptance_criterion(self, base_solution:Solution, best_solution:Solution, solution:Solution, i:int, threshold:int, degradation_grace_period = -1):    
         grace_period = degradation_grace_period
         if (solution < best_solution):
             best_solution = solution
-            logging.info(f"The best cost {best_solution.cost} is found at {i+1}th iteration with threshold {threshold}")
+            logging.info(f"The best cost {best_solution.cost()} is found at {i+1}th iteration with threshold {threshold}")
         if (solution <= base_solution):
             base_solution = solution
             if solution not in self.history:
@@ -60,7 +49,7 @@ class ILS(ABC):
             grace_period -= 1
             if grace_period == 0:
                 solution = self.history.pop()
-                logging.info(f"Degraded base solution with cost {base_solution.cost} to the solution with cost {solution.cost}")
+                logging.info(f"Degraded base solution with cost {base_solution.cost()} to the solution with cost {solution.cost()}")
                 base_solution, solution
                 grace_period = degradation_grace_period
         return base_solution, best_solution
@@ -72,7 +61,7 @@ class ILS(ABC):
         start_time = time()
         self.init_solution_history()
         base_solution = self.construct_initial_solution(data)
-        base_solution.cost = self.tour_cost(base_solution.nodes)
+        
         # Getting local optima
         best_solution = base_solution = self.local_search(base_solution, threshold)
         i = 0
@@ -81,7 +70,6 @@ class ILS(ABC):
             solution = self.local_search(solution, threshold)        
             base_solution, best_solution = self.acceptance_criterion(base_solution, best_solution, solution, i, threshold, degradation_grace_period)
             i += 1
-        
         end_time = time()
         elapsed_time = end_time - start_time
         logging.info(f"Solution = {solution}")

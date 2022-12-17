@@ -7,7 +7,8 @@ def test_comparison():
     
     assert s1 >= s2
 
-    s1.cost = 1.0
+    s1.add_node([1,1])
+    s1.add_node([2,2])
 
     assert s1 >= s2
     assert s1 > s2
