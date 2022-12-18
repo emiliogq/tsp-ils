@@ -40,7 +40,7 @@ class ILS(ABC):
         grace_period = degradation_grace_period
         if (solution < best_solution):
             best_solution = solution
-            logging.info(f"The best cost {best_solution.cost()} is found at {i+1}th iteration with threshold {threshold}")
+            logging.info(f"The best cost {best_solution.cost} is found at {i+1}th iteration with threshold {threshold}")
         if (solution <= base_solution):
             base_solution = solution
             if solution not in self.history:
@@ -49,7 +49,7 @@ class ILS(ABC):
             grace_period -= 1
             if grace_period == 0:
                 solution = self.history.pop()
-                logging.info(f"Degraded base solution with cost {base_solution.cost()} to the solution with cost {solution.cost()}")
+                logging.info(f"Degraded base solution with cost {base_solution.cost} to the solution with cost {solution.cost}")
                 base_solution, solution
                 grace_period = degradation_grace_period
         return base_solution, best_solution

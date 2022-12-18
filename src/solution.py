@@ -7,12 +7,10 @@ class Solution:
         self.edges = [ self.create_edge(self.nodes[i], self.nodes[i+1]) for i in range(len(self.nodes)-1)]
         if len(self.nodes) > 1:
             self.edges.append(self.create_edge(self.nodes[-1], self.nodes[0]))
-        
-    def cost(self) -> float:
-        return sum([edge.distance for edge in self.edges])
+        self.cost = sum([edge.distance for edge in self.edges])
     
     def __eq__(self, solution:'Solution'):
-        has_same_cost = solution.cost() == self.cost()
+        has_same_cost = solution.cost == self.cost
         has_same_node_len = len(self.nodes) == len(solution.nodes)
         return has_same_cost and has_same_node_len and all([ node in solution.nodes for node in self.nodes])
             
@@ -20,6 +18,10 @@ class Solution:
         xa,ya = node_a
         xb,yb = node_b
         return Edge(Node(xa,ya), Node(xb,yb))
+
+    def add_edge(self, edge: Edge):
+        self.edges.append
+        self.cost += edge.distance
     
     def add_node(self, node):
         x, y = node
@@ -36,8 +38,8 @@ class Solution:
                 last:Edge = self.edges.pop()
                 origin, end = last.origin, last.end     
             
-            self.edges.append(Edge(origin, inserted_node))
-            self.edges.append(Edge(inserted_node, end))
+            self.add_edge(Edge(origin, inserted_node))
+            self.add_edge(Edge(inserted_node, end))
 
         
     def remove_nodes(self):
@@ -46,19 +48,20 @@ class Solution:
     
     def remove_edges(self):
         self.edges.clear()
+        self.cost = 0.0
     
     def __ge__(self, solution:'Solution'):
         
-        return self.cost() >= solution.cost()
+        return self.cost >= solution.cost
     
     def __le__(self, solution:'Solution'):
-        return self.cost() <= solution.cost()
+        return self.cost <= solution.cost
 
     def __gt__(self, solution:'Solution'):
-        return self.cost() > solution.cost()
+        return self.cost > solution.cost
     
     def __lt__(self, solution:'Solution'):
-        return self.cost() < solution.cost()    
+        return self.cost < solution.cost    
 
     def __str__(self) -> str:
-        return f"Cost = {self.cost()}"
+        return f"Cost = {self.cost}"
